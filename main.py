@@ -56,10 +56,20 @@ def combo_result():
 
 def update_labels(elapsed_time):
     if combo.get() > 0:
-        resultLabel.config(text=f"Correcto!\nTiempo: {elapsed_time} segundos.", foreground="lightgreen")
+        resultLabel.config(
+            text=f"Correcto!\nTiempo: {elapsed_time} segundos.", 
+            foreground="lightgreen",    
+            anchor="center",   
+            justify="center"
+        )    # Centra el texto en múltiples líneas)
         puntaje.set(puntaje.get() + 10 + combo.get() * 2)
     else:
-        resultLabel.config(text=f"Incorrecto!\nTiempo: {elapsed_time} segundos.", foreground="red")
+        resultLabel.config(
+            text=f"Incorrecto!\nTiempo: {elapsed_time} segundos.", 
+            foreground="red",
+            anchor="center",
+            justify="center"
+            )
         puntaje.set(puntaje.get() - 25)
 
     puntajeLabel.config(text=f"Puntaje: {puntaje.get()}")
@@ -70,7 +80,7 @@ def cronometro():
     tiempo = time.time() - start_time  # Calcula el tiempo transcurrido
     cronometroLabel.config(text=f"Tiempo: {round(tiempo, 2)} segundos")  # Actualiza el texto del Label
     if userEntry.get() != "ñ":  # Si no se ha terminado el juego
-        tkWindow.after(50, cronometro)  # Llama a cronometro nuevamente después de 100 ms
+        tkWindow.after(100, cronometro)  # Llama a cronometro nuevamente después de 100 ms
     if tiempo >= 10:  # Si el tiempo es mayor o igual a 60 segundos
         end_game()
 
@@ -84,15 +94,26 @@ def end_game():
     comboLabel.config(text=f"Combo final: {combo.get()}")
     userEntry.delete(0, END)
 
+def centrar_ventana(window, ancho=500, alto=400):
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+    
+    x = int((screen_width / 2) - (ancho / 2))
+    y = int((screen_height / 2) - (alto / 2))
+    
+    window.geometry(f"{ancho}x{alto}+{x}+{y}")
+
 # Obtener palabras
-words_site = "https://www.mit.edu/~ecprice/wordlist.10000"
-response = requests.get(words_site)
+words_site =[("https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/english.txt"), 
+             ("https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/spanish.txt"),
+             ]
+response = requests.get(words_site[random.randint(0, 1)])
 words = response.text.splitlines()
 
 # Configuración de la ventana
 tkWindow = ttk.Window(themename="darkly")
 tkWindow.title("Typing Game")
-tkWindow.geometry('500x400')
+centrar_ventana(tkWindow, 500, 400)
 tkWindow.title('Python Typing Game')
 
 # Variables
