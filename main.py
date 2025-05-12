@@ -34,7 +34,7 @@ def update(status):
     elif status == 0:
         combo_result()
     else:
-        combo.set(0)  # Reinicia el combo
+        combo.set(0) 
 
     update_labels(elapsed_time)
     next_word()
@@ -61,7 +61,7 @@ def update_labels(elapsed_time):
             foreground="lightgreen",    
             anchor="center",   
             justify="center"
-        )    # Centra el texto en múltiples líneas)
+        )  
         puntaje.set(puntaje.get() + 10 + combo.get() * 2)
     else:
         resultLabel.config(
@@ -77,50 +77,57 @@ def update_labels(elapsed_time):
 
 def cronometro():
     global start_time
-    tiempo = time.time() - start_time  # Calcula el tiempo transcurrido
-    cronometroLabel.config(text=f"Tiempo: {round(tiempo, 2)} segundos")  # Actualiza el texto del Label
-    if userEntry.get() != "ñ":  # Si no se ha terminado el juego
-        tkWindow.after(100, cronometro)  # Llama a cronometro nuevamente después de 100 ms
-    if tiempo >= 10:  # Si el tiempo es mayor o igual a 60 segundos
+    tiempo = time.time() - start_time
+    cronometroLabel.config(text=f"Tiempo: {round(tiempo, 1)} segundos")
+    if userEntry.get() != "ñ":
+        tkWindow.after(100, cronometro)
+    if tiempo >= 10:
         end_game()
 
 def end_game():
     wordLabel.config(state="disabled", foreground="white")
     userEntry.config(state="disabled", foreground="white")
+    userEntry.bind("<Return>", lambda e: None) 
     resultLabel.config(text="Juego terminado", foreground="blue")
     cronometroLabel.config(text="")
     puntajeLabel.config(text=f"Puntaje final: {puntaje.get()}")
-    combo.set(0)  # Reinicia el combo
+    combo.set(0)  
     comboLabel.config(text=f"Combo final: {combo.get()}")
     userEntry.delete(0, END)
 
-def centrar_ventana(window, ancho=500, alto=400):
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
-    
-    x = int((screen_width / 2) - (ancho / 2))
-    y = int((screen_height / 2) - (alto / 2))
-    
-    window.geometry(f"{ancho}x{alto}+{x}+{y}")
+def toggle_fullscreen(event=None):
+    global fullscreen_state
+    fullscreen_state = not fullscreen_state
+    tkWindow.attributes("-fullscreen", fullscreen_state)
+    return "break"
+
+def end_fullscreen(event=None):
+    global fullscreen_state
+    fullscreen_state = False
+    tkWindow.attributes("-fullscreen", False)
+    return "break"
 
 # Obtener palabras
 words_site =[("https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/english.txt"), 
              ("https://raw.githubusercontent.com/kkrypt0nn/wordlists/refs/heads/main/wordlists/languages/spanish.txt"),
              ]
-response = requests.get(words_site[random.randint(0, 1)])
+response = requests.get(words_site[0])
 words = response.text.splitlines()
 
 # Configuración de la ventana
-tkWindow = ttk.Window(themename="darkly")
+tkWindow = ttk.Window(themename="vapor", title="Type")
+tkWindow.attributes("-fullscreen", True)
 tkWindow.title("Typing Game")
-centrar_ventana(tkWindow, 500, 400)
 tkWindow.title('Python Typing Game')
+tkWindow.bind("<F11>", toggle_fullscreen)
+tkWindow.bind("<Escape>", end_fullscreen)
 
 # Variables
 puntaje = ttk.IntVar(value=0)
 combo = ttk.IntVar(value=0)
 current_word = ""
 start_time = 0
+fullscreen_state = True
 
 # Etiquetas y entrada de texto
 wordLabel = ttk.Label(tkWindow, text="", font=('Helvetica', 18))
